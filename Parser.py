@@ -19,13 +19,22 @@ class Parser:
         self.fichiertest = "Dumas_test.txt"
         self.dicocount={}
         self.aumoinstrois={}
+        self.dicounigrame={}
         self.dicobigrame={}
         self.dicotrigrame={}
         
     def mesgram(self) :
         fread = open(self.fichiertrainunk,"r")
         for l in fread: 
-            malist=l.split()      
+            malist=l.split()
+            unigrams=self.__find_ngrams(malist, 1)
+            for unigram in unigrams:
+                
+        
+                if self.dicounigrame.has_key(unigram):                    
+                    self.dicounigrame[unigram] = self.dicounigrame[unigram] +1
+                else :
+                    self.dicounigrame[unigram]= 1      
             bigrams=self.__find_ngrams(malist, 2)
             for bigram in bigrams:
                 
@@ -44,15 +53,18 @@ class Parser:
                     self.dicotrigrame[trigram]= 1
             
            
-        
+        print(collections.Counter(self.dicounigrame).most_common(20))
         print(collections.Counter(self.dicobigrame).most_common(20))
         print(collections.Counter(self.dicotrigrame).most_common(20))
+       
         
     def __my_private_method(self):
         pass
 
     def __find_ngrams(self,input_list, n):
-        return zip(*[input_list[i:] for i in range(n)])
+      
+            return zip(*[input_list[i:] for i in range(n)])
+        
 
         
     def lexicon_aumoinstrois(self): 
