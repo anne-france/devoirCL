@@ -11,3 +11,7 @@ if __name__ == '__main__':
 
     parser.count_wordfile()
     parser.lexicon_aumoinstrois()
+    
+   
+    parser.standardinazionfile()
+    parser.mesgram()
