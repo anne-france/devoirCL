@@ -4,7 +4,12 @@ Created on 21 oct. 2016
 @author: anne-francevanswieten
 '''
 from Parser import Parser
+from modelTester import ModelTester
+import re
 
+def removeEmptyCharacter(wordsList):
+    print wordsList.remove('')
+    print "Passe ici"
 
 if __name__ == '__main__':
     parser = Parser()
@@ -25,4 +30,6 @@ if __name__ == '__main__':
     test2Gram["this is"] = 14
     trainingData = dict(test2Gram, **test3Gram)
 
-    print str(trainingData)
+    myTester = ModelTester(trainingData)
+    print "Perplexity : " + myTester.getPerplexity("Dumas_test.txt")
+
