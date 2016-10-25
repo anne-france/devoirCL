@@ -18,10 +18,10 @@ class Parser:
         self.fichiertrainunk = "Dumas_train_unk.txt"
         self.fichiertest = "Dumas_test.txt"
         self.dicocount={}
-        self.aumoinstrois={}
-        self.dicounigrame={}
-        self.dicobigrame={}
-        self.dicotrigrame={}
+        self.threeOccurencesCount={}
+        self.dictUnigrame={}
+        self.dictBigrame={}
+        self.dictTrigrame={}
         
     def mesgram(self) :
         file = open(self.fichiertrainunk,"r")
@@ -31,31 +31,31 @@ class Parser:
             for unigram in unigrams:
                 
         
-                if self.dicounigrame.has_key(unigram):                    
-                    self.dicounigrame[unigram] = self.dicounigrame[unigram] +1
+                if self.dictUnigrame.has_key(unigram):
+                    self.dictUnigrame[unigram] = self.dictUnigrame[unigram] + 1
                 else :
-                    self.dicounigrame[unigram]= 1      
+                    self.dictUnigrame[unigram]= 1
             bigrams=self.__find_ngrams(malist, 2)
             for bigram in bigrams:
                 
         
-                if self.dicobigrame.has_key(bigram):                    
-                    self.dicobigrame[bigram] = self.dicobigrame[bigram] +1
+                if self.dictBigrame.has_key(bigram):
+                    self.dictBigrame[bigram] = self.dictBigrame[bigram] + 1
                 else :
-                    self.dicobigrame[bigram]= 1
+                    self.dictBigrame[bigram]= 1
             trigrams=self.__find_ngrams(malist, 3)
             for trigram in trigrams:
                 
         
-                if self.dicotrigrame.has_key(trigram):                    
-                    self.dicotrigrame[trigram] = self.dicotrigrame[trigram] +1
+                if self.dictTrigrame.has_key(trigram):
+                    self.dictTrigrame[trigram] = self.dictTrigrame[trigram] + 1
                 else :
-                    self.dicotrigrame[trigram]= 1
+                    self.dictTrigrame[trigram]= 1
             
            
-        print(collections.Counter(self.dicounigrame).most_common(20))
-        print(collections.Counter(self.dicobigrame).most_common(20))
-        print(collections.Counter(self.dicotrigrame).most_common(20))
+        print(collections.Counter(self.dictUnigrame).most_common(20))
+        print(collections.Counter(self.dictBigrame).most_common(20))
+        print(collections.Counter(self.dictTrigrame).most_common(20))
        
         
     def __my_private_method(self):
@@ -72,8 +72,8 @@ class Parser:
         for k,v in self.dicocount.iteritems():
             if (v>=3):
                 #print("mot " + k + " count= "+ str(v))
-                self.aumoinstrois [k]=v
-        print(len(self.aumoinstrois))
+                self.threeOccurencesCount [k]=v
+        print(len(self.threeOccurencesCount))
         
     def standardinazionfile(self):
         file = open(self.fichiertrain,"r")
@@ -111,7 +111,7 @@ class Parser:
                     
                     mots= phrase.split()
                     for mot in mots:
-                        if (self.aumoinstrois.get(mot)==None):
+                        if (self.threeOccurencesCount.get(mot)==None):
                             phrase = phrase.replace(mot, '<UNK>')
 
                            
