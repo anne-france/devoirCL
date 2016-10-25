@@ -24,9 +24,9 @@ class Parser:
         self.dicotrigrame={}
         
     def mesgram(self) :
-        fread = open(self.fichiertrainunk,"r")
-        for l in fread: 
-            malist=l.split()
+        file = open(self.fichiertrainunk,"r")
+        for line in file:
+            malist=line.split()
             unigrams=self.__find_ngrams(malist, 1)
             for unigram in unigrams:
                 
@@ -76,12 +76,12 @@ class Parser:
         print(len(self.aumoinstrois))
         
     def standardinazionfile(self):
-        fread = open(self.fichiertrain,"r")
+        file = open(self.fichiertrain,"r")
         fwrite = open(self.fichiertrainunk,"w")
-        for l in fread:
+        for line in file:
             #retire "\n"
-            l.strip()
-            w=l.splitlines()
+            line.strip()
+            w=line.splitlines()
             #print(w,len(w))
             
             
@@ -121,7 +121,7 @@ class Parser:
                 
             
         fwrite.close()
-        fread.close()
+        file.close()
             
         
         
@@ -129,13 +129,13 @@ class Parser:
         
     def count_wordfile(self):
         #ouverture du fichier
-        f = open(self.fichiertrain,"r")
+        file = open(self.fichiertrain,"r")
     
-        for l in f:
+        for line in file:
            
             #retire "\n"
-            l.strip()
-            w=l.splitlines()
+            line.strip()
+            w=line.splitlines()
             #print(w,len(w))
             mots=w[0].split(" ")
             
@@ -170,7 +170,7 @@ class Parser:
         print("\n")
        
         #fermeture
-        f.close()
+        file.close()
        
         
         

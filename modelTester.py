@@ -1,7 +1,8 @@
 class ModelTester:
 
-    def __init__(self, testFile, modelOrder, nGram):
+    def __init__(self, testFile):
         self.testFile = testFile
 
-    def getPerplexity(self, modelOrder, nGram):
+    def getPerplexity(self,trainingData):
+        likelihood = 0
         return 0
