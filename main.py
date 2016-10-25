@@ -7,14 +7,14 @@ from Parser import Parser
 
 
 if __name__ == '__main__':
-    # parser = Parser()
-    #
-    # parser.count_wordfile()
-    # parser.lexicon_aumoinstrois()
-    #
-    #
-    # parser.standardinazionfile()
-    # parser.mesgram()
+    parser = Parser()
+
+    parser.count_wordfile()
+    parser.lexicon_aumoinstrois()
+
+
+    parser.standardinazionfile()
+    parser.mesgram()
 
     test3Gram = {}
     test2Gram = {}
