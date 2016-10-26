@@ -18,7 +18,7 @@ class Parser:
         self.fichiertrainunk = "Dumas_train_unk.txt"
         self.fichiertest = "Dumas_test.txt"
         self.dicocount={}
-        self.aumoinstrois={}
+        self.dicoAtLeastThrre={}
         self.dicounigrame={}
         self.dicobigrame={}
         self.dicotrigrame={}
@@ -28,149 +28,128 @@ class Parser:
         for l in fread: 
             malist=l.split()
             unigrams=self.__find_ngrams(malist, 1)
-            for unigram in unigrams:
-                
-        
-                if self.dicounigrame.has_key(unigram):                    
-                    self.dicounigrame[unigram] = self.dicounigrame[unigram] +1
-                else :
-                    self.dicounigrame[unigram]= 1      
+            self.__count_ngrams(unigrams,self.dicounigrame)   
             bigrams=self.__find_ngrams(malist, 2)
-            for bigram in bigrams:
-                
-        
-                if self.dicobigrame.has_key(bigram):                    
-                    self.dicobigrame[bigram] = self.dicobigrame[bigram] +1
-                else :
-                    self.dicobigrame[bigram]= 1
+            self.__count_ngrams(bigrams,self.dicobigrame) 
             trigrams=self.__find_ngrams(malist, 3)
-            for trigram in trigrams:
-                
-        
-                if self.dicotrigrame.has_key(trigram):                    
-                    self.dicotrigrame[trigram] = self.dicotrigrame[trigram] +1
-                else :
-                    self.dicotrigrame[trigram]= 1
+            self.__count_ngrams(trigrams,self.dicotrigrame) 
             
-           
+        fread.close()   
         print(collections.Counter(self.dicounigrame).most_common(20))
         print(collections.Counter(self.dicobigrame).most_common(20))
         print(collections.Counter(self.dicotrigrame).most_common(20))
        
         
-    def __my_private_method(self):
-        pass
-
-    def __find_ngrams(self,input_list, n):
-      
+    
+    def __find_ngrams(self,input_list, n):      
             return zip(*[input_list[i:] for i in range(n)])
         
-
+    def __count_ngrams(self,gram_List, myDicoGram):   
+        for gram in gram_List:
+            if myDicoGram.has_key(gram):                    
+                myDicoGram[gram] = myDicoGram[gram] +1
+            else :
+                myDicoGram[gram]= 1 
+                  
+    def statgram(self) :
+        dicostatbi={}
+        for v in self.dicobigrame.itervalues():
+            if dicostatbi.has_key(v):                    
+                dicostatbi[v] = dicostatbi[v] +1
+            else :
+                dicostatbi[v]= 1  
+        sortedlist= sorted(dicostatbi.items(), key=lambda t: t[0])
+        fwriterbi = open("stabitgrammebi.csv","w") 
+        for entry in sortedlist:
+            fwriterbi.write(str(entry[0]) +"," + str(entry[1])+"\n")       
+             
         
-    def lexicon_aumoinstrois(self): 
+        fwriterbi.close
+        dicostattri={}
+        for v in self.dicotrigrame.itervalues():
+            if dicostattri.has_key(v):                    
+                dicostattri[v] = dicostattri[v] +1
+            else :
+                dicostattri[v]= 1  
+        sortedlist= sorted(dicostattri.items(), key=lambda t: t[0])
+        fwritertri = open("stabitgrammetri.csv","w") 
+        for entry in sortedlist:
+            fwritertri.write(str(entry[0]) +"," + str(entry[1])+"\n")       
+             
+        
+        fwritertri.close          
+       
+             
          
+         
+    def lexicon_aumoinstrois(self):          
         for k,v in self.dicocount.iteritems():
             if (v>=3):
                 #print("mot " + k + " count= "+ str(v))
-                self.aumoinstrois [k]=v
-        print(len(self.aumoinstrois))
+                self.dicoAtLeastThrre [k]=v
+        #print(len(self.aumoinstrois))
         
     def standardinazionfile(self):
         fread = open(self.fichiertrain,"r")
         fwrite = open(self.fichiertrainunk,"w")
-        for l in fread:
+        for lignes in fread:
             #retire "\n"
-            l.strip()
-            w=l.splitlines()
-            #print(w,len(w))
-            
-            
-            phrases=re.split(r'[?;/.!]', w[0])
+            lignes.strip()
+            ligne=lignes.splitlines()      
+            sentences=re.split(r'[?;/.!]', ligne[0])
            
-           
-            #phrases=w[0].split(".")
-            for phrase in phrases:
-                phrase=phrase.strip()
-            
-                phrase=phrase.lower()
-                phrase = phrase.replace("'\"", '')
-               
-                phrase = phrase.replace('\"', '')
-               
-               #phrase= phrase.replace("\\", "\\\\")
-                phrase = phrase.replace('`', '')
-                phrase = phrase.replace(',', '')
-                phrase = phrase.replace(':', '')
-               
-                
-                  
-                
-
-                
-                if (phrase != "" and phrase != '"' and phrase != "'" and phrase != " " ):
-                    
-                    mots= phrase.split()
-                    for mot in mots:
-                        if (self.aumoinstrois.get(mot)==None):
-                            phrase = phrase.replace(mot, '<UNK>')
-
-                           
-                    phrase="<s> " + phrase + " </s>\n"
+            for sentence in sentences:
+                sentence=sentence.strip()
+                sentence=sentence.lower()
+                sentence = sentence.replace("'\"", '')
+                sentence = sentence.replace('\"', '')         
+                sentence = sentence.replace('`', '')
+                sentence = sentence.replace(',', '')
+                sentence = sentence.replace(':', '')
+                if (sentence != "" and sentence != '"' and sentence != "'" and sentence != " " ):                  
+                    words= sentence.split()
+                    for word in words:
+                        if (self.dicoAtLeastThrre.has_key(word)==False):
+                            sentence = sentence.replace(word,"<UNK>")
+      
+                    sentence=sentence + " </s>\n"
                     #print(phrase)
-                    fwrite.write(phrase)
+                    fwrite.write(sentence)
                 
             
         fwrite.close()
         fread.close()
             
-        
-        
        
-        
     def count_wordfile(self):
         #ouverture du fichier
-        f = open(self.fichiertrain,"r")
-    
-        for l in f:
-           
-            #retire "\n"
-            l.strip()
-            w=l.splitlines()
-            #print(w,len(w))
-            mots=w[0].split(" ")
-            
-           
-            for mot in mots:
-                #print(mot,len(mot))
-                mot=mot.lower()
-                mot = mot.replace('"', '', 4)
-                mot = mot.replace('?', '')
-                mot = mot.replace('.', '')
-                mot = mot.replace('!', '')
-                mot = mot.replace(';', '')
-                mot = mot.replace(',', '')
-                mot = mot.replace(':', '')
-                mot = mot.replace(' ', '')
-                if (mot != ''):
-                    if self.dicocount.has_key(mot):                    
-                        self.dicocount[mot] = self.dicocount[mot] +1
+        fread = open(self.fichiertrain,"r")
+        for lignes in fread:
+                #retire "\n"
+            lignes.strip()
+            ligne=lignes.splitlines()
+            words=ligne[0].split(" ")           
+            for word in words:
+                word = word.lower()
+                word = word.replace('"', '', 4)
+                word = word.replace('?', '')
+                word = word.replace('.', '')
+                word = word.replace('!', '')
+                word = word.replace(';', '')
+                word = word.replace(',', '')
+                word = word.replace(':', '')
+                word = word.replace(' ', '')
+                if (word != ''):
+                    if self.dicocount.has_key(word):                    
+                        self.dicocount[word] = self.dicocount[word] +1
                     else :
-                        self.dicocount[mot]= 1
-         
-        #for key, value in self.dicocount.iteritems():
-            #print key, value      
-        # trier sur la valeur plus bessoin
-        #dicotrier= sorted(self.dicocount.iteritems(), reverse=True, key=operator.itemgetter(1))
-        #
+                        self.dicocount[word]= 1
+ 
         print(len(self.dicocount))
-        #les 20 mote les plus frequents
-        
+        #les 20 mote les plus frequent
         print(collections.Counter(self.dicocount).most_common(20))
-        
-        print("\n")
-       
         #fermeture
-        f.close()
+        fread.close()
        
         
         
