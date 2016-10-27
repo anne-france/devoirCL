@@ -16,3 +16,6 @@ if __name__ == '__main__':
     parser.standardinazionfile()
     parser.mesgram()
     parser.statgram()
+    parser.prob_Add_One_Unigrams()
+    parser.prob_Add_One_Bigrams()
+    print(parser.verifProb())

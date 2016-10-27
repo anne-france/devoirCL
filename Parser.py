@@ -14,30 +14,81 @@ class Parser:
 
     def __init__(self):
         
+        
+        self.fichiertest = "Dumas_test.txt"
+       
         self.fichiertrain = "Dumas_train.txt"
         self.fichiertrainunk = "Dumas_train_unk.txt"
         self.fichiertest = "Dumas_test.txt"
         self.dicocount={}
-        self.dicoAtLeastThrre={}
-        self.dicounigrame={}
-        self.dicobigrame={}
-        self.dicotrigrame={}
+        self.threeOccurencesCount={}
+        self.dictUnigrame={}
+        self.dictBigrame={}
+        self.dictTrigrame={}
+        self.dictProbUnigrame={}
+        self.dictProbBigrame={}
         
+    def prob_Add_One_Unigrams(self):
+        nbre_token= len(self.dictUnigrame)
+        total_words=0.0
+        for count in self.dictUnigrame.itervalues():
+            total_words=total_words+count
+        
+        for word,count in self.dictUnigrame.iteritems():
+            self.dictProbUnigrame[word] = (count+1) / (total_words+nbre_token)
+            
+            
+ 
+    def prob_Add_One_Bigrams(self):
+        dicthistory={}
+        #pas sure
+        nbre_token= len(self.dictUnigrame)
+        total_words=0.0
+        for count in self.dictUnigrame.itervalues():
+            total_words=total_words+count
+       
+       
+        for word,count in self.dictBigrame.iteritems():
+            counthistory=0.0
+            wordhistory=word[0]
+            counthistory=self.dictUnigrame.get((word[0],))
+            counthistory= counthistory
+            probahistory=self.dictProbUnigrame.get((word[0],))
+            proba=((count+1.0) / (counthistory +nbre_token ))
+            #proba= proba*probahistory
+            print(str(counthistory))
+            self.dictProbBigrame[word] =proba
+             
+    def verifProb(self):
+        sumAllProb=0.0
+        good=True
+        for prob in self.dictProbUnigrame.itervalues():
+            sumAllProb=sumAllProb+prob
+        print("prob unigramme " +str(sumAllProb))
+        if ( str(sumAllProb) != "1.0"):
+            good=False 
+        sumAllProb=0.0
+        for prob in self.dictProbBigrame.itervalues():
+            sumAllProb=sumAllProb+prob
+        print("prob bigramme " +str(sumAllProb))
+        if ( str(sumAllProb) != "1.0"):
+            good=False 
+        return good
     def mesgram(self) :
         fread = open(self.fichiertrainunk,"r")
         for l in fread: 
             malist=l.split()
             unigrams=self.__find_ngrams(malist, 1)
-            self.__count_ngrams(unigrams,self.dicounigrame)   
+            self.__count_ngrams(unigrams,self.dictUnigrame)   
             bigrams=self.__find_ngrams(malist, 2)
-            self.__count_ngrams(bigrams,self.dicobigrame) 
+            self.__count_ngrams(bigrams,self.dictBigrame) 
             trigrams=self.__find_ngrams(malist, 3)
-            self.__count_ngrams(trigrams,self.dicotrigrame) 
+            self.__count_ngrams(trigrams,self.dictTrigrame) 
             
         fread.close()   
-        print(collections.Counter(self.dicounigrame).most_common(20))
-        print(collections.Counter(self.dicobigrame).most_common(20))
-        print(collections.Counter(self.dicotrigrame).most_common(20))
+        print(collections.Counter(self.dictUnigrame).most_common(20))
+        print(collections.Counter(self.dictBigrame).most_common(20))
+        print(collections.Counter(self.dictTrigrame).most_common(20))
        
         
     
@@ -53,7 +104,7 @@ class Parser:
                   
     def statgram(self) :
         dicostatbi={}
-        for v in self.dicobigrame.itervalues():
+        for v in self.dictBigrame.itervalues():
             if dicostatbi.has_key(v):                    
                 dicostatbi[v] = dicostatbi[v] +1
             else :
@@ -66,7 +117,7 @@ class Parser:
         
         fwriterbi.close
         dicostattri={}
-        for v in self.dicotrigrame.itervalues():
+        for v in self.dictTrigrame.itervalues():
             if dicostattri.has_key(v):                    
                 dicostattri[v] = dicostattri[v] +1
             else :
@@ -86,34 +137,42 @@ class Parser:
         for k,v in self.dicocount.iteritems():
             if (v>=3):
                 #print("mot " + k + " count= "+ str(v))
-                self.dicoAtLeastThrre [k]=v
+                self.threeOccurencesCount [k]=v
         #print(len(self.aumoinstrois))
         
     def standardinazionfile(self):
         fread = open(self.fichiertrain,"r")
         fwrite = open(self.fichiertrainunk,"w")
-        for lignes in fread:
+        regexexp = re.compile(r"(^\' \')|(^\'\s*)")
+        for lines in fread:
             #retire "\n"
-            lignes.strip()
-            ligne=lignes.splitlines()      
-            sentences=re.split(r'[?;/.!]', ligne[0])
+            lines.strip()
+            line=lines.splitlines()      
+            sentences=re.split(r'[?;/.!]', line[0])
            
             for sentence in sentences:
-                sentence=sentence.strip()
+               
                 sentence=sentence.lower()
                 sentence = sentence.replace("'\"", '')
                 sentence = sentence.replace('\"', '')         
                 sentence = sentence.replace('`', '')
                 sentence = sentence.replace(',', '')
                 sentence = sentence.replace(':', '')
-                if (sentence != "" and sentence != '"' and sentence != "'" and sentence != " " ):                  
+                sentence=sentence.strip()
+               
+                if (sentence != "" and sentence != '"' and sentence != "'" and sentence != " " ): 
+                    
+                       
+                    sentence= re.sub(regexexp, '', sentence)
+
+                    
                     words= sentence.split()
                     for word in words:
-                        if (self.dicoAtLeastThrre.has_key(word)==False):
+                        if (self.threeOccurencesCount.has_key(word)==False):
                             sentence = sentence.replace(word,"<UNK>")
       
                     sentence=sentence + " </s>\n"
-                    #print(phrase)
+                    #print(sentence)
                     fwrite.write(sentence)
                 
             
@@ -123,12 +182,11 @@ class Parser:
        
     def count_wordfile(self):
         #ouverture du fichier
-        fread = open(self.fichiertrain,"r")
-        for lignes in fread:
-                #retire "\n"
-            lignes.strip()
-            ligne=lignes.splitlines()
-            words=ligne[0].split(" ")           
+        file = open(self.fichiertrain,"r")
+        for lines in file:
+            lines.strip()
+            line=lines.splitlines()
+            words=line[0].split()           
             for word in words:
                 word = word.lower()
                 word = word.replace('"', '', 4)
@@ -139,6 +197,7 @@ class Parser:
                 word = word.replace(',', '')
                 word = word.replace(':', '')
                 word = word.replace(' ', '')
+                #print(word)
                 if (word != ''):
                     if self.dicocount.has_key(word):                    
                         self.dicocount[word] = self.dicocount[word] +1
@@ -149,7 +208,7 @@ class Parser:
         #les 20 mote les plus frequent
         print(collections.Counter(self.dicocount).most_common(20))
         #fermeture
-        fread.close()
+        file.close()
        
         
         
