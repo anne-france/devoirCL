@@ -6,6 +6,7 @@ Created on 21 oct. 2016
 import operator
 import collections
 import re
+import math
 class Parser:
     '''
     classdocs
@@ -17,7 +18,7 @@ class Parser:
         
         self.fichiertest = "Dumas_test.txt"
        
-        self.fichiertrain = "Dumas_train.txt"
+        self.fichiertrain = "petit.txt"
         self.fichiertrainunk = "Dumas_train_unk.txt"
         self.fichiertest = "Dumas_test.txt"
         self.dicocount={}
@@ -27,6 +28,8 @@ class Parser:
         self.dictTrigrame={}
         self.dictProbUnigrame={}
         self.dictProbBigrame={}
+        self.dictProbTrigrame={}
+        self.filter=1
         
     def prob_Add_One_Unigrams(self):
         nbre_token= len(self.dictUnigrame)
@@ -37,28 +40,42 @@ class Parser:
         for word,count in self.dictUnigrame.iteritems():
             self.dictProbUnigrame[word] = (count+1) / (total_words+nbre_token)
             
-            
- 
+    
     def prob_Add_One_Bigrams(self):
-        dicthistory={}
+       
         #pas sure
-        nbre_token= len(self.dictUnigrame)
-        total_words=0.0
-        for count in self.dictUnigrame.itervalues():
-            total_words=total_words+count
-       
-       
+        nbre_token= pow(len(self.dictUnigrame),2)
+        print("nombre de token" + str(nbre_token))
+        print("nombre de token" + str(len(self.dictBigrame)))
         for word,count in self.dictBigrame.iteritems():
-            counthistory=0.0
-            wordhistory=word[0]
+           
             counthistory=self.dictUnigrame.get((word[0],))
-            counthistory= counthistory
+            counthistory= counthistory+1
             probahistory=self.dictProbUnigrame.get((word[0],))
-            proba=((count+1.0) / (counthistory +nbre_token ))
-            #proba= proba*probahistory
-            print(str(counthistory))
-            self.dictProbBigrame[word] =proba
-             
+            proba=((count+1.0) / (counthistory + nbre_token ))
+            proba=math.log(proba,10)
+           
+            #print(str(count+1) + " "  +str(counthistory + nbre_token))
+            self.dictProbBigrame[word]= math.pow(10,proba)
+    
+    
+    
+    
+    def prob_Add_One_Trigrams(self):
+       
+        #pas sure
+        nbre_token= pow(len(self.dictUnigrame),3)
+        
+        for word,count in self.dictTrigrame.iteritems():
+            print(str(word) + " " + str(count))
+            counthistory=self.dictUnigrame.get((word[0],))
+            counthistory= counthistory+1
+            probahistory=self.dictProbUnigrame.get((word[0],))
+            proba=((count+1.0) / (counthistory + nbre_token ))
+            proba= math.log(proba,10)
+           
+            #print(str(count+1) + " "  +str(counthistory + nbre_token))
+            self.dictProbTrigrame[word] =pow(10,proba)         
     def verifProb(self):
         sumAllProb=0.0
         good=True
@@ -70,16 +87,28 @@ class Parser:
         sumAllProb=0.0
         for prob in self.dictProbBigrame.itervalues():
             sumAllProb=sumAllProb+prob
+       
+        
         print("prob bigramme " +str(sumAllProb))
         if ( str(sumAllProb) != "1.0"):
-            good=False 
+            good=False
+        sumAllProb=0.0
+        for prob in self.dictProbTrigrame.itervalues():
+            sumAllProb=sumAllProb+prob
+       
+        
+        print("prob Trigramme " +str(sumAllProb))
+        if ( str(sumAllProb) != "1.0"):
+            good=False  
         return good
     def mesgram(self) :
         fread = open(self.fichiertrainunk,"r")
         for l in fread: 
             malist=l.split()
             unigrams=self.__find_ngrams(malist, 1)
-            self.__count_ngrams(unigrams,self.dictUnigrame)   
+            self.__count_ngrams(unigrams,self.dictUnigrame)  
+            #generer tout les bigramme possible
+        
             bigrams=self.__find_ngrams(malist, 2)
             self.__count_ngrams(bigrams,self.dictBigrame) 
             trigrams=self.__find_ngrams(malist, 3)
@@ -90,8 +119,38 @@ class Parser:
         print(collections.Counter(self.dictBigrame).most_common(20))
         print(collections.Counter(self.dictTrigrame).most_common(20))
        
+    def genbiramTest(self): 
+        tabkey= self.dictUnigrame.keys()
+        i=0
+        while(i<len(tabkey)):           
+            j=0 
+            while(j<len(tabkey)):
+                myTuple=(tabkey[i][0],tabkey[j][0]) 
+                print(myTuple)            
+                if self.dictBigrame.has_key(myTuple):                    
+                    self.dictBigrame[myTuple] = self.dictBigrame[myTuple] +1
+                else :
+                    self.dictBigrame[myTuple]= 0
+                j =j +1
+            i =i +1
+    def gentriramTest(self): 
+        tabkeyuni= self.dictUnigrame.keys()
         
-    
+        i=0
+        while(i<len(tabkeyuni)):           
+            j=0 
+            while(j<len(tabkeyuni)):
+                k=0
+                while(k<len(tabkeyuni)):
+                    myTuple=(tabkeyuni[i][0],tabkeyuni[j][0], tabkeyuni[k][0]) 
+                    #print(myTuple)            
+                    if self.dictTrigrame.has_key(myTuple):                    
+                        self.dictTrigrame[myTuple] = self.dictTrigrame[myTuple] +1
+                    else :
+                        self.dictTrigrame[myTuple]= 0
+                    k=k+1
+                j =j +1
+            i =i +1
     def __find_ngrams(self,input_list, n):      
             return zip(*[input_list[i:] for i in range(n)])
         
@@ -135,10 +194,10 @@ class Parser:
          
     def lexicon_aumoinstrois(self):          
         for k,v in self.dicocount.iteritems():
-            if (v>=3):
+            if (v>=self.filter):
                 #print("mot " + k + " count= "+ str(v))
                 self.threeOccurencesCount [k]=v
-        #print(len(self.aumoinstrois))
+        print(" longeur au moins trois" + str(len(self.threeOccurencesCount)))
         
     def standardinazionfile(self):
         fread = open(self.fichiertrain,"r")
@@ -170,6 +229,7 @@ class Parser:
                     for word in words:
                         if (self.threeOccurencesCount.has_key(word)==False):
                             sentence = sentence.replace(word,"<UNK>")
+                            #print ("inconnu" + word)
       
                     sentence=sentence + " </s>\n"
                     #print(sentence)
