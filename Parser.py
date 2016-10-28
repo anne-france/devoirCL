@@ -102,19 +102,19 @@ class Parser:
             good=False  
         return good
     def mesgram(self) :
-        fread = open(self.fichiertrainunk,"r")
-        for l in fread: 
-            malist=l.split()
+        file = open(self.fichiertrainunk,"r")
+        for line in file:
+            malist=line.split()
             unigrams=self.__find_ngrams(malist, 1)
             self.__count_ngrams(unigrams,self.dictUnigrame)  
             #generer tout les bigramme possible
-        
+
             bigrams=self.__find_ngrams(malist, 2)
             self.__count_ngrams(bigrams,self.dictBigrame) 
             trigrams=self.__find_ngrams(malist, 3)
             self.__count_ngrams(trigrams,self.dictTrigrame) 
             
-        fread.close()   
+        file.close()
         print(collections.Counter(self.dictUnigrame).most_common(20))
         print(collections.Counter(self.dictBigrame).most_common(20))
         print(collections.Counter(self.dictTrigrame).most_common(20))
@@ -200,10 +200,10 @@ class Parser:
         print(" longeur au moins trois" + str(len(self.threeOccurencesCount)))
         
     def standardinazionfile(self):
-        fread = open(self.fichiertrain,"r")
+        file = open(self.fichiertrain,"r")
         fwrite = open(self.fichiertrainunk,"w")
         regexexp = re.compile(r"(^\' \')|(^\'\s*)")
-        for lines in fread:
+        for lines in file:
             #retire "\n"
             lines.strip()
             line=lines.splitlines()      
@@ -219,8 +219,7 @@ class Parser:
                 sentence = sentence.replace(':', '')
                 sentence=sentence.strip()
                
-                if (sentence != "" and sentence != '"' and sentence != "'" and sentence != " " ): 
-                    
+                if (sentence != "" and sentence != '"' and sentence != "'" and sentence != " " ):
                        
                     sentence= re.sub(regexexp, '', sentence)
 
@@ -237,7 +236,7 @@ class Parser:
                 
             
         fwrite.close()
-        fread.close()
+        file.close()
             
        
     def count_wordfile(self):
