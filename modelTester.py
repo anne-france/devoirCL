@@ -16,7 +16,7 @@ class ModelTester:
     def __getListOfWords(self, file):
         totalWordList = []
         for line in file:
-            lineWordsList = re.split(r'\,?\"?\`?\:?\;?(\!?)(\??)(\.?)\s?', line.lower())
+            lineWordsList = re.split(r'\,?\"?\`?-?\:?\;?(\!?)(\??)(\.?)\s?', line.lower())
             listLength = lineWordsList.__len__()
             word = 0
             while word < listLength:
@@ -48,20 +48,35 @@ class ModelTester:
         return historyString
 
     def __getLikelihood(self, history, word):
-        CHW = history + " " + word
-        try:
-            if self.trainingData[history] != 0:
-                return self.trainingData[CHW] / self.trainingData[history]
-        except KeyError:
-            return 0
+        historySplit = history.split(' ')
+        if not self.trainingData.has_key((word,)):
+            word = "<UNK>"
+        if historySplit.__len__() == 1:
+            if not self.trainingData.has_key((historySplit[0],)):
+                historySplit[0] = "<UNK>"
+            CHW = (historySplit[0], word)
+        else:
+            if not self.trainingData.has_key((historySplit[0],)):
+                historySplit[0] = "<UNK>"
+            if not self.trainingData.has_key((historySplit[1], )):
+                historySplit[1] = "<UNK>"
+            history = (historySplit[0], historySplit[1])
+            CHW = (historySplit[0], historySplit[1], word)
+
+        if self.trainingData.has_key(history) and self.trainingData.has_key(CHW):
+            return math.log(float(float(self.trainingData[CHW]) / float(self.trainingData[history])), 2)
+        else:
+            return math.log(1.0/13200.0, 2)
 
     def __processPerplexityOfModel(self):
 
-        perplexity = len(self.trainingData)
+        i = float(1.0/13200.0)
+        logLikelihood = math.log(i, 2)
 
         for wordIterator in range(1, self.wordsList.__len__()):
-            perplexity = perplexity * self.__getLikelihood(self.__getHistory(wordIterator), self.wordsList[wordIterator])
+            logLikelihood += self.__getLikelihood(self.__getHistory(wordIterator), self.wordsList[wordIterator])
 
-        perplexity = math.pow(perplexity, 1/self.wordsList.__len__())
+        logLikelihood = float(logLikelihood / float(self.wordsList.__len__()))
+        perplexity = math.pow(2, -float(logLikelihood))
 
         return perplexity

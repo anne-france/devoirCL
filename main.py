@@ -23,6 +23,7 @@ if __name__ == '__main__':
     trainingData = dict(parser.dictUnigrame, **parser.dictBigrame)
     trainingData = dict(trainingData, **parser.dictTrigrame)
 
+    print str(trainingData[('the','cat')])
     myTester = ModelTester(trainingData)
     print "Perplexity : " + str(myTester.getPerplexity("Dumas_test.txt"))
 
