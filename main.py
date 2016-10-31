@@ -1,41 +1,29 @@
-'''
-Created on 21 oct. 2016
-
-@author: anne-francevanswieten
-'''
 from Parser import Parser
+import cProfile
+from modelTrainer import ModelTrainer
 from modelTester import ModelTester
-import re
-
-def removeEmptyCharacter(wordsList):
-    print wordsList.remove('')
-    print "Passe ici"
 
 if __name__ == '__main__':
-    parser = Parser()
+    trainingParser = Parser("Dumas_train.txt")
+    testParser = Parser("Dumas_test.txt")
+    modelTrainer = ModelTrainer(trainingParser)
+    modelTester = ModelTester(testParser)
 
-    parser.count_wordfile()
-    parser.lexicon_aumoinstrois()
+    #Training
+    #uniGram = modelTrainer.train(1)
+    #biGram = modelTrainer.train(2)
+    #triGram = modelTrainer.train(3)
 
-    parser.standardinazionfile()
-    parser.mesgram()
-    parser.statgram()
-    
-    
-    
-    parser.genbiramTest()
-    parser.gentriramTest()
-    parser.prob_Add_One_Unigrams()
-    parser.prob_Add_One_Bigrams()
-    parser.prob_Add_One_Trigrams()
+    #Count
+    #uniGram.printLexiconCount()
+    #biGram.printLexiconCount()
+    #triGram.printLexiconCount()
 
-    print(parser.verifProb())
+    #20 more frequent
+    #uniGram.printTwentyMoreFrequentLexicon()
+    #biGram.printTwentyMoreFrequentLexicon()
+    #triGram.printTwentyMoreFrequentLexicon()
 
-    # trainingData = dict(parser.dictUnigrame, **parser.dictBigrame)
-    # trainingData = dict(trainingData, **parser.dictTrigrame)
-
-    trainingData = dict(parser.dictProbUnigrame, **parser.dictProbBigrame)
-    trainingData = dict(trainingData, **parser.dictTrigrame)
-
-    myTester = ModelTester(trainingData)
-    print "Perplexity : " + str(myTester.getPerplexity("Dumas_test.txt"))
+    #Process perplexity
+    #print "Laplace perplexity : " + str(modelTester.getPerplexity(triGram, "laplace")) + " on " + str(triGram.getLexiconCount()) + " lexicon type"
+    #print "Bayesian perplexity : " + str(modelTester.getPerplexity(triGram, "backoff")) + " on " + str(triGram.getLexiconCount()) + " lexicon type"
