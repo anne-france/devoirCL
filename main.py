@@ -10,9 +10,9 @@ if __name__ == '__main__':
     modelTester = ModelTester(testParser)
 
     #Training
-    #uniGram = modelTrainer.train(1)
-    #biGram = modelTrainer.train(2)
-    #triGram = modelTrainer.train(3)
+    uniGram = modelTrainer.train(1)
+    biGram = modelTrainer.train(2)
+    triGram = modelTrainer.train(3)
 
     #Count
     #uniGram.printLexiconCount()
@@ -20,10 +20,14 @@ if __name__ == '__main__':
     #triGram.printLexiconCount()
 
     #20 more frequent
-    #uniGram.printTwentyMoreFrequentLexicon()
+    uniGram.printTwentyMoreFrequentLexicon()
     #biGram.printTwentyMoreFrequentLexicon()
     #triGram.printTwentyMoreFrequentLexicon()
 
     #Process perplexity
-    #print "Laplace perplexity : " + str(modelTester.getPerplexity(triGram, "laplace")) + " on " + str(triGram.getLexiconCount()) + " lexicon type"
+    #print "Laplace perplexity : " + str(modelTester.printTwentyMoreFrequentLexicon(triGram, "laplace")) + " on " + str(triGram.getLexiconCount()) + " lexicon type"
     #print "Bayesian perplexity : " + str(modelTester.getPerplexity(triGram, "backoff")) + " on " + str(triGram.getLexiconCount()) + " lexicon type"
+    
+    #Excel
+    biGram.statCvs();
+    triGram.statCvs();

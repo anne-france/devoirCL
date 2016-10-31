@@ -71,3 +71,18 @@ class Model:
 
     def hasKey(self, key):
         return self.nGramList[self.modelOrder - 1].has_key(key)
+    
+    def statCvs(self):
+        dicoStat={}       
+        for v in self.nGramList[self.modelOrder - 1].itervalues():        
+            if dicoStat.has_key(v):                   
+                dicoStat[v] = dicoStat[v] +1
+            else :
+                dicoStat[v]= 1  
+        sortedlist= sorted(dicoStat.items(), key=lambda t: t[0])
+        fwriterbi = open("StatGramme_"+ str(self.modelOrder) +".csv","w") 
+        for entry in sortedlist:
+            fwriterbi.write(str(entry[0]) +"," + str(entry[1])+"\n")    
+        fwriterbi.close      
+        
+        
