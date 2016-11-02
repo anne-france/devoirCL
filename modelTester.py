@@ -27,10 +27,10 @@ class ModelTester:
         logLikelihood = 0
         if smoothingType == "laplace":
             for wordIterator in range(self.model.modelOrder - 1, wordsList.__len__()):
-                logLikelihood += self.model.laplaceLikelihood(wordsList[wordIterator], self.__getHistory(wordIterator, wordsList))
+                logLikelihood += math.log(self.model.laplaceLikelihood(wordsList[wordIterator], self.__getHistory(wordIterator, wordsList)), 2)
         elif smoothingType == "backoff":
             for wordIterator in range(self.model.modelOrder - 1, wordsList.__len__()):
-                logLikelihood += self.model.backOffLikelihood(wordsList[wordIterator], self.__getHistory(wordIterator, wordsList))
+                logLikelihood += math.log(self.model.backOffLikelihood(wordsList[wordIterator], self.__getHistory(wordIterator, wordsList)), 2)
 
         logLikelihood = float(logLikelihood / float(wordsList.__len__()))
         perplexity = math.pow(2, -float(logLikelihood))
